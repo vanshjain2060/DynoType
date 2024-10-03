@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap');
+
+:root {
+    --bgc : #333;
+    --textPrimary : #fff;
+    --textSecondary : #666;
+    --primaryColor : #fd4;
+}
+
+body {
+    font-family: 'Indie Flower', cursive;
+    font-family: monospace;
+    font-size: 1.5em;
+    background-color: var(--bgc);
+    color: var(--textPrimary);
+}
+
+main {
+    width: 600px;
+    margin: 50px auto;
+}
+
+h1 {
+    color: var(--primaryColor);
+}
+
+
+#header{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 20px 6px 30px;
+}
+
+#buttons {
+    text-align: right;
+}
+
+#info {
+    color : var(--primaryColor)
+}
+
+button {
+    background-color: rgba(255,255,255, 0.2);
+    border: none;
+    color: rgba(255,255,255, 0.5);
+    padding: 5px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.word {
+    position: relative;
+    display: flex;
+    margin: 0 6px;
+    color: var(--textSecondary);
+}
+
+#words {
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 16px; 
+}
+
+#game {
+    line-height: 20px;
+    height: 105px;
+    overflow: hidden;
+    position: relative;
+    outline: 0;
+}
+
+#game:not(:focus) #words {
+    filter: blur(5px);
+}
+
+#game:focus #words {
+    filter: blur(0px);
+} 
+
+#game:focus #focus-error {
+    display: none;
+} 
+
+#game:not(:focus) #focus-error {
+    display: block;
+}  
+
+#game:not(:focus) .letter.current::after {
+    display: none;
+} 
+
+#focus-error {
+    position: absolute;
+    inset: 0;
+    display: none;
+    text-align: center;
+    padding-top: 35px;
+    color: var(--textPrimary);
+} 
+
+.letter.correct {
+    color:#fff
+}
+
+.letter.incorrect {
+    color:#f93737
+}
+
+.letter {
+    position: relative;
+}
+
+.letter.current::after {
+    display: block;
+    content: "";
+    height: 100%;
+    width: 2px;
+    background-color: var(--primaryColor);
+    position: absolute;
+    left: -1px;
+    bottom: 0;
+    opacity: 10%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%{opacity: 0%;}
+    50%{opacity: 100%;}
+    100%{opacity: 0%;}
+}
+
+#game.over .letter.current::after {
+    display: none;
+}
+
+#game.over #words{
+    opacity: 0.4;
+    filter: blur(0px);
+}
+
+#game.over #focus-error {
+    display: none;
+}
