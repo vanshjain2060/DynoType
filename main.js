@@ -3,7 +3,7 @@ const words =
     " "
   );
 
-const gameTime = 60;
+let gameTime = 60;
 window.timer = null;
 window.startTime = 0;
 window.pauseTime = 0;
@@ -86,6 +86,15 @@ function addClass(element, className) {
 function removeClass(element, className) {
   element.className = element.className.replace(className, "").trim();
 }
+
+const timerBtn = document.getElementById("timerBtn");
+timerBtn.addEventListener("click", (event) => {
+  if (event.target.tagName === "SPAN") {
+    const time = event.target.innerHTML;
+    gameTime = parseInt(time);
+    document.getElementById("info").innerHTML = gameTime;
+  }
+});
 
 game.addEventListener("keydown", (event) => {
   const key = event.key;
@@ -198,7 +207,7 @@ game.addEventListener("keydown", (event) => {
   }
 
   // to Move Lines Up
-  if (currentWord.getBoundingClientRect().top > 250) {
+  if (currentWord.getBoundingClientRect().top > 220) {
     const words = document.getElementById("words");
     const margin = parseInt(words.style.marginTop || "0px");
     words.style.marginTop = margin - 35 + "px";

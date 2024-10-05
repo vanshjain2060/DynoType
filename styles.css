@@ -33,6 +33,7 @@ h1 {
 
 #buttons {
     text-align: right;
+    display: flex;
 }
 
 #info {
@@ -46,6 +47,7 @@ button {
     padding: 5px 20px;
     border-radius: 5px;
     cursor: pointer;
+    margin-left: 20px;
 }
 
 .word {
@@ -140,4 +142,8 @@ button {
 
 #game.over #focus-error {
     display: none;
+}
+
+.clicked {
+    color: var(--primaryColor);
 }
