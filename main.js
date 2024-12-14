@@ -287,13 +287,8 @@ game.addEventListener("keydown", (event) => {
     words.style.marginTop = margin - 35 + "px";
   }
 });
-
 document.getElementById("refreshBtn").addEventListener("click", () => {
   location.reload();
-});
-
-document.getElementById("restartBtn").addEventListener("click", () => {
-  newGame();
 });
 
 newGame();
