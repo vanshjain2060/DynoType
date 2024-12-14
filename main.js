@@ -4,6 +4,12 @@ const words =
   );
 
 let gameTime = 60;
+let correctKeystrokes = 0;
+let incorrectKeystrokes = 0;
+let correctWords = 0;
+let totalWords = 0;
+let timeData = [];
+let wpmData = [];
 window.timer = null;
 window.startTime = 0;
 window.pauseTime = 0;
@@ -28,6 +34,11 @@ function newGame() {
   document.getElementById("info").innerHTML = gameTime;
   addClass(document.querySelector(".word"), "current");
   addClass(document.querySelector(".letter"), "current");
+  document.getElementById("results").style.display = "none";
+  document.getElementById("game").style.display = "block";
+  document.getElementById("header").style.display = "flex";
+  timeData = [];
+  wpmData = [];
 }
 
 function getWpm() {
@@ -55,22 +66,55 @@ function getWpm() {
     }
   }
 
-  return (correctWordCount / gameTime) * 60; // Return WPM
+  return Math.floor((correctWordCount / gameTime) * 60); // Return WPM
+}
+
+function calculateAccuracy() {
+  const totalKeystrokes = correctKeystrokes + incorrectKeystrokes;
+  return totalKeystrokes > 0 ? (correctKeystrokes / totalKeystrokes) * 100 : 0;
+}
+
+function calculateRawSpeed() {
+  return Math.floor((totalWords / gameTime) * 60);
+}
+
+function calculateConsistency() {
+  return (correctWords / totalWords) * 100;
 }
 
 function gameOver() {
   clearInterval(window.timer);
   addClass(document.getElementById("game"), "over");
-  const result = getWpm();
-  document.getElementById("info").innerHTML = `WPM: ${result}`;
+  const wpm = getWpm();
+  const accuracy = calculateAccuracy().toFixed(2);
+  const rawSpeed = calculateRawSpeed();
+  const consistency = calculateConsistency().toFixed(2);
+  const timeTaken = gameTime - parseInt(document.getElementById("info").innerHTML);
+  document.getElementById("info").innerHTML = `
+    <div class="stat" style="font-size: 2em;">WPM: ${wpm}</div>
+    <div class="stat" style="font-size: 2em;">Accuracy: ${accuracy}%</div>
+  `;
+
+  // Show results
+  document.getElementById("game").style.display = "none";
+  document.getElementById("results").style.display = "block";
+  document.getElementById("header").style.display = "none";
+  document.getElementById("details").innerHTML = `
+    Speed: ${wpm} WPM<br><br>
+    Accuracy: ${accuracy}%<br><br>
+    Correct Words: ${correctWords}<br><br>
+    Raw Speed: ${rawSpeed} WPM<br><br>
+    Consistency: ${consistency}%<br><br>
+    Time: ${timeTaken} seconds<br>
+  `;
 }
 
 function formatWord(word) {
   return `<div class="word">
         ${word
-          .split("")
-          .map((letter) => `<span class="letter">${letter}</span>`)
-          .join("")}
+      .split("")
+      .map((letter) => `<span class="letter">${letter}</span>`)
+      .join("")}
     </div>`;
 }
 
@@ -91,12 +135,31 @@ const timerBtn = document.getElementById("timerBtn");
 timerBtn.addEventListener("click", (event) => {
   if (event.target.tagName === "SPAN") {
     const time = event.target.innerHTML;
-    gameTime = parseInt(time);
-    document.getElementById("info").innerHTML = gameTime;
+    console.log(time);
+    if (time == "@") {
+      addClass(document.querySelector(".main"), "makeBlur");
+      addClass(document.querySelector(".custom"), "customDisplay");
+      const inputBox = document.querySelector(".custom input");
+      const btn = document.querySelector(".custom button");
+      btn.addEventListener("click", () => {
+        gameTime = parseInt(inputBox.value);
+        document.getElementById("info").innerHTML = gameTime;
+        removeClass(document.querySelector(".main"), "makeBlur");
+        removeClass(document.querySelector(".custom"), "customDisplay");
+      });
+    } else {
+      gameTime = parseInt(time);
+      document.getElementById("info").innerHTML = gameTime;
+    }
   }
 });
 
 game.addEventListener("keydown", (event) => {
+  if (event.key == "Tab") {
+    event.preventDefault();
+    newGame();
+  }
+
   const key = event.key;
   const currentWord = document.querySelector(".word.current");
   const currentLetter = document.querySelector(".letter.current");
@@ -115,26 +178,33 @@ game.addEventListener("keydown", (event) => {
       if (!window.startTime) window.startTime = new Date().getTime();
       const currTime = new Date().getTime();
       const secPassed = Math.round((currTime - window.startTime) / 1000);
-
-      // const msPassed = currentTime - window.startTime;
-      // const sPassed = Math.round(msPassed / 1000);
-      // const sLeft = Math.round(gameTime / 1000 - sPassed);
       const timeLeft = gameTime - secPassed;
-      console.log(
-        `secPassed: ${secPassed}, gameTime: ${gameTime}, currTime: ${currTime}, startTime: ${window.startTime}, timeLeft: ${timeLeft}`
-      );
+
       if (timeLeft <= 0) {
         document.getElementById("info").innerHTML = timeLeft;
         gameOver();
         return;
       }
       document.getElementById("info").innerHTML = timeLeft;
+      timeData.push(secPassed);
+      wpmData.push(getWpm());
     }, 1000);
   }
 
+  if (key == "Tab") {
+    gameOver();
+    newGame();
+  }
+
   if (isLetter) {
+    const isCorrect = key == expected;
+    if (isCorrect) {
+      correctKeystrokes++;
+    } else {
+      incorrectKeystrokes++;
+    }
     if (currentLetter) {
-      addClass(currentLetter, key == expected ? "correct" : "incorrect");
+      addClass(currentLetter, isCorrect ? "correct" : "incorrect");
       removeClass(currentLetter, "current");
       if (currentLetter.nextSibling)
         addClass(currentLetter.nextSibling, "current");
@@ -164,6 +234,10 @@ game.addEventListener("keydown", (event) => {
     if (firstLetter) addClass(firstLetter, "current");
     if (currentLetter) {
       removeClass(currentLetter, "current");
+    }
+    totalWords++;
+    if (currentWord.querySelectorAll(".letter.correct").length === currentWord.querySelectorAll(".letter").length) {
+      correctWords++;
     }
   }
 
@@ -214,8 +288,12 @@ game.addEventListener("keydown", (event) => {
   }
 });
 
-document.getElementById("btn").addEventListener("click", () => {
-  location.reload(); // Refresh the page
+document.getElementById("refreshBtn").addEventListener("click", () => {
+  location.reload();
+});
+
+document.getElementById("restartBtn").addEventListener("click", () => {
+  newGame();
 });
 
 newGame();

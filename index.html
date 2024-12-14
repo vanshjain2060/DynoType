@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Test</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body class="font-mono bg-gray-600 text-white">
-    <main>
+    <main class="main">
         <h1>DynoType</h1>
         <div id="header">
             <div id="info"></div>
@@ -17,15 +18,26 @@
                     <span>30</span>
                     <span>60</span>
                     <span>120</span>
+                    <span id="custombtn" >@</span>
                 </div>
-                <button id="btn">New game</button>
+                <button id="refreshBtn" tabindex="-1">New game</button>
             </div>
         </div>
         <div id="game" tabindex="0">
             <div id="words"></div>
             <div id="cursor"></div>
         </div>
+        <div id="results" style="display: none;">
+            <div id="wpm-accuracy"></div>
+            <div id="details"></div>
+            <button id="restartBtn">Restart Game</button>
+        </div>
     </main>
+    <div class="custom">
+        <h2>Test Duration</h2>
+        <input type="number" id="time">
+        <button>Ok</button>
+    </div>
 
     <script src="main.js"></script>
 </body>
